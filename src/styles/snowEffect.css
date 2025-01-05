@@ -1,0 +1,28 @@
+/* snowEffect.css */
+.snow-bg {
+    position: relative;
+    overflow: hidden;  /* Ensures the snow doesn’t overflow outside the section */
+ }
+ 
+ .snow-bg:after {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: 1;  /* Make sure it is below the text */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: url('https://library.elementor.com/resources/christmas-snow-effect/s1.png'), 
+                       url('https://library.elementor.com/resources/christmas-snow-effect/s2.png'), 
+                       url('https://library.elementor.com/resources/christmas-snow-effect/s3.png');
+    animation: snow 10s linear infinite;
+ }
+ 
+ @keyframes snow {
+   0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+   50% {background-position: 500px 500px, 100px 200px, -100px 150px;}
+   100% {background-position: 500px 1000px, 200px 400px, -100px 300px;}
+ }
+ 
