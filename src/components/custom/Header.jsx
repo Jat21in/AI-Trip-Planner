@@ -97,7 +97,7 @@ function Header() {
               </Popover>
             </div>
           ) : (
-            <Button onClick={() => setOpenDialog(true)} className='snow-bg'>Sign In</Button>
+            <Button onClick={() => setOpenDialog(true)} className='rounded-full snow-bg'>Sign In</Button>
           )}
         </div>
 

@@ -17,7 +17,7 @@ function Hero() {
       </p>
 
       <Link to={'/create-trip'}>
-        <Button className="z-10">Get Started, It's Free</Button>
+        <Button className="rounded-full z-10">Get Started, It's Free</Button>
       </Link>
     </div>
   );
