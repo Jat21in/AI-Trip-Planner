@@ -33,16 +33,16 @@ function HotelCardItem({ hotel }) {
       to={`https://www.google.com/maps/search/?api=1&query=${hotel?.hotelName},${hotel.hotelAddress}`}
       target='_blank'
     >
-      <div className='hover:scale-105 transition-all cursor-pointer'>
-        <div className='relative h-[180px] w-full rounded-xl overflow-hidden'>
+      <div className='snow-bg hover:scale-105 transition-all cursor-pointer'>
+        <div className='snow-bg relative h-[180px] w-full rounded-xl overflow-hidden'>
           {isImageLoading && (
-            <div className='absolute inset-0 bg-slate-200 animate-pulse rounded-xl'></div>
+            <div className='snow-bg absolute inset-0 bg-slate-200 animate-pulse rounded-xl'></div>
           )}
           {photoUrl && (
             <img
               src={photoUrl}
               alt={hotel?.hotelName}
-              className={`rounded-xl h-full w-full object-cover ${
+              className={`snow-bg rounded-xl h-full w-full object-cover ${
                 isImageLoading ? 'opacity-0' : 'opacity-100'
               } transition-opacity duration-500`}
               onLoad={() => setIsImageLoading(false)}

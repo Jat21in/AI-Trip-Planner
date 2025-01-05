@@ -38,15 +38,15 @@ function InfoSection({ trip }) {
   return (
     <div>
       {/* Image Section with Skeleton Effect */}
-      <div className="relative w-full h-[300px] object-cover overflow-hidden rounded-xl">
+      <div className="snow-bg relative w-full h-[300px] object-cover overflow-hidden rounded-xl">
         {isImageLoading && (
-          <div className="absolute inset-0 bg-slate-200 animate-pulse rounded-xl"></div>
+          <div className="snow-bg absolute inset-0 bg-slate-200 animate-pulse rounded-xl"></div>
         )}
         {photoUrl && (
           <img
             src={photoUrl}
             alt="Trip Preview"
-            className={`w-full h-full object-cover rounded-xl ${
+            className={`snow-bg w-full h-full object-cover rounded-xl ${
               isImageLoading ? 'opacity-0' : 'opacity-100'
             } transition-opacity duration-500`}
             onLoad={() => setIsImageLoading(false)}
@@ -65,7 +65,7 @@ function InfoSection({ trip }) {
         {/* <Button className="rounded-lg w-auto p-3 text-white flex items-center justify-center transition-all">
           <IoIosSend className="text-xl" />
         </Button> */}
-        <IoIosSend className="text-xl" />
+        <IoIosSend className="snow-bg text-xl" />
       </div>
     </div>
   );

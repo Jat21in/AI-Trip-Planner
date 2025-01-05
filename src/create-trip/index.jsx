@@ -159,15 +159,15 @@ function CreateTrip() {
   }, []);
 
   return (
-    <div className='sm:px-10 md:px-32 lg:px-56 xl:pd-10 px-5 mt-10'>
-      <h2 className='font-bold text-3xl'>Tell us your travel preferences 🏕️🌴</h2>
-      <p className='mt-3 text-gray-500 text-xl'>
+    <div className='snow-bg sm:px-10 md:px-32 lg:px-56 xl:pd-10 px-5 mt-10'>
+      <h2 className='snow-bg font-bold text-3xl'>Tell us your travel preferences 🏕️🌴</h2>
+      <p className='snow-bg mt-3 text-gray-500 text-xl'>
         Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.
       </p>
 
-      <div className='mt-20 flex flex-col gap-10'>
+      <div className='snow-bg mt-20 flex flex-col gap-10'>
         <div>
-          <h2 className='text-xl my-3 font-medium'>What is the destination of choice?</h2>
+          <h2 className='snow-bg text-xl my-3 font-medium'>What is the destination of choice?</h2>
           <input
             id="autocomplete"
             type="text"
@@ -236,13 +236,13 @@ function CreateTrip() {
           <DialogHeader>
             <DialogDescription>
               <img src="/logo.svg" alt="Logo" />
-              <h2 className='font-bold text-lg mt-7'>Sign In With Google</h2>
+              <h2 className='snow-bg font-bold text-lg mt-7'>Sign In With Google</h2>
               <p>Sign in to the App with Google authentication securely</p>
               <Button
                 onClick={login}
-                className="w-full mt-5 flex gap-4 items-center"
+                className="snow-bg w-full mt-5 flex gap-4 items-center"
               >
-                <FcGoogle className='h-7 w-7' />
+                <FcGoogle className='snow-bg h-7 w-7' />
                 Sign In With Google
               </Button>
             </DialogDescription>

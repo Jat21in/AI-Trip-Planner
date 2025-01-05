@@ -33,17 +33,17 @@ function PlaceCardItem({ place }) {
       to={`https://www.google.com/maps/search/?api=1&query=${place.placeName}`} 
       target='_blank'
     >
-      <div className="border rounded-xl p-4 mt-4 flex items-stretch gap-6 bg-white shadow-lg hover:scale-105 transition-all hover:shadow-md cursor-pointer">
+      <div className="snow-bg border rounded-xl p-4 mt-4 flex items-stretch gap-6 bg-white shadow-lg hover:scale-105 transition-all hover:shadow-md cursor-pointer">
         {/* Image Section with Skeleton Effect */}
-        <div className="relative w-full h-[130px] overflow-hidden rounded-xl">
+        <div className="snow-bg relative w-full h-[130px] overflow-hidden rounded-xl">
           {isImageLoading && (
-            <div className="absolute inset-0 bg-slate-200 animate-pulse rounded-xl"></div>
+            <div className="snow-bg absolute inset-0 bg-slate-200 animate-pulse rounded-xl"></div>
           )}
           {photoUrl && (
             <img
               src={photoUrl}
               alt={place.placeName}
-              className={`w-full h-full object-cover rounded-xl ${
+              className={`snow-bg w-full h-full object-cover rounded-xl ${
                 isImageLoading ? 'opacity-0' : 'opacity-100'
               } transition-opacity duration-500`}
               onLoad={() => setIsImageLoading(false)}

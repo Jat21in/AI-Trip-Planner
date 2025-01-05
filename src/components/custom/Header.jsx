@@ -61,12 +61,12 @@ function Header() {
   };
 
   return (
-    <div className="p-3 shadow-sm flex justify-between items-center px-5">
+    <div className="snow-bg p-3 shadow-sm flex justify-between items-center px-5">
       <img src="/Logo.PNG" alt="Logo" className="snow-bg max-w-[200px] max-h-[50px] w-auto h-auto object-contain" />
       <div>
         <div className="flex items-center gap-5">
           {user ? (
-            <div className="flex items-center gap-3"> {/* Adjusted gap here */}
+            <div className="snow-bg flex items-center gap-3"> {/* Adjusted gap here */}
               <a href='/create-trip'>
                 <Button variant="outline" className="snow-bg rounded-full">
                   + Create Trip

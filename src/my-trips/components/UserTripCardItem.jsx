@@ -42,14 +42,14 @@ function UserTripCardItem({ trip }) {
 
   return (
     <Link to={"/view-trip/" + trip?.id}>
-      <div className="hover:scale-105 transition-all ">
+      <div className="snow-bg hover:scale-105 transition-all ">
         <img
           src={photoUrl || ""}
-          className="object-cover rounded-xl h-[250px]"
+          className="snow-bg object-cover rounded-xl h-[250px]"
         />
         <div>
-          <h2 className="font-bold text-lg">{location}</h2>
-          <h2 className="text-sm text-gray-500">
+          <h2 className="snow-bg font-bold text-lg">{location}</h2>
+          <h2 className="snow-bg text-sm text-gray-500">
             {noOfDays} Days trip with {budget} Budget
           </h2>
         </div>
