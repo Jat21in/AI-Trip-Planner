@@ -19,21 +19,27 @@ import { db } from '@/service/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 
 function CreateTrip() {
+  const [formData, setFormData] = useState({});
   const [place, setPlace] = useState();
-  const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [userAuthenticated, setUserAuthenticated] = useState(false);
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
-    const updatedFormData = [...formData.filter(item => item.name !== name), { name, value }];
-    setFormData(updatedFormData);
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    console.log('Form Data:', formData);
-  }, [formData]);
+  const validateFields = () => {
+    const requiredFields = ['location', 'noOfDays', 'budget', 'traveler'];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        toast.error(`Please fill the ${field} field!`);
+        return false;
+      }
+    }
+    return true;
+  };
 
   const login = useGoogleLogin({
     onSuccess: (tokenInfo) => {
@@ -42,7 +48,7 @@ function CreateTrip() {
     onError: (error) => {
       console.error("Login failed:", error);
       toast.error("Google Login failed. Please try again.");
-    }
+    },
   });
 
   const GetUserProfile = (tokenInfo) => {
@@ -53,7 +59,6 @@ function CreateTrip() {
       },
     })
       .then((resp) => {
-        console.log(resp.data);
         localStorage.setItem('user', JSON.stringify(resp.data));
         setUserAuthenticated(true);
         setOpenDialog(false);
@@ -66,65 +71,51 @@ function CreateTrip() {
   };
 
   const OnGenerateTrip = async () => {
-    const user = localStorage.getItem('user');
+    if (!validateFields()) return;
 
-    if (!user || !userAuthenticated) {
+    if (!userAuthenticated) {
       setOpenDialog(true);
       toast.warning("Please sign in with Google to proceed.");
       return;
     }
 
-    const noOfDays = formData?.find(item => item.name === 'noOfDays')?.value;
-    const location = formData?.find(item => item.name === 'location');
-    const budget = formData?.find(item => item.name === 'budget');
-    const traveler = formData?.find(item => item.name === 'traveler');
-
-    if (!noOfDays || !location || !budget || !traveler) {
-      toast.error("Please fill all details!");
-      return;
-    }
-
     setLoading(true);
     const FINAL_PROMPT = AI_PROMPT
-      .replace('{location}', location?.value)
-      .replace('{totalDays}', noOfDays)
-      .replace('{traveler}', traveler?.value)
-      .replace('{budget}', budget?.value)
-      .replace('{totalDays}', noOfDays);
-
-    // console.log('FINAL PROMPT:', FINAL_PROMPT);
+      .replace('{location}', formData.location)
+      .replace('{totalDays}', formData.noOfDays)
+      .replace('{traveler}', formData.traveler)
+      .replace('{budget}', formData.budget);
 
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
-      console.log("--",result?.response?.text()); // Logging AI response
       setLoading(false);
-      SaveAiTrip(result?.response?.text())
+      SaveAiTrip(result?.response?.text());
       toast.success("Trip generated successfully!");
     } catch (error) {
+      setLoading(false);
       console.error("Failed to generate trip:", error);
       toast.error("Error generating trip. Please try again.");
     }
   };
- 
-  const SaveAiTrip = async(TripData)=>{
-    // Add a new document in collection "cities"
+
+  const SaveAiTrip = async (TripData) => {
     setLoading(true);
     const user = JSON.parse(localStorage.getItem('user'));
-    const docId=Date.now().toString()
+    const docId = Date.now().toString();
 
     await setDoc(doc(db, "AITrips", docId), {
-      userSelection : formData,
-      tripData : JSON.parse(TripData),
+      userSelection: formData,
+      tripData: JSON.parse(TripData),
       userEmail: user?.email,
-      id:docId
+      id: docId,
     });
     setLoading(false);
-    navigate('/view-trip/'+docId)
-  }
+    navigate('/view-trip/' + docId);
+  };
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = "https://maps.gomaps.pro/maps/api/js?key=AlzaSyMZ0PnjjUCrj28W2xINuXl232Ph5AQn0Pu&libraries=places&callback=initAutocomplete";
+    script.src = "https://maps.gomaps.pro/maps/api/js?key=AlzaSyaDR0THIsyDP9-wr8cY_Leb3fRRQWxYiFe&libraries=places&callback=initAutocomplete";
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);
@@ -135,7 +126,7 @@ function CreateTrip() {
       const input = document.getElementById('autocomplete');
       autocomplete = new window.google.maps.places.Autocomplete(input, {
         types: ['(cities)'],
-        fields: ['name', 'formatted_address', 'place_id', 'geometry'],
+        fields: ['formatted_address'],
       });
 
       autocomplete.addListener('place_changed', () => {
@@ -194,7 +185,7 @@ function CreateTrip() {
                 key={index}
                 onClick={() => handleInputChange('budget', item.title)}
                 className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
-                  formData?.find(i => i.name === 'budget')?.value === item.title ? 'shadow-lg border-black' : ''
+                  formData.budget === item.title ? 'shadow-lg border-black' : ''
                 }`}
               >
                 <h2 className='text-4xl'>{item.icon}</h2>
@@ -213,7 +204,7 @@ function CreateTrip() {
                 key={index}
                 onClick={() => handleInputChange('traveler', item.people)}
                 className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
-                  formData?.find(i => i.name === 'traveler')?.value === item.people ? 'shadow-lg border-black' : ''
+                  formData.traveler === item.people ? 'shadow-lg border-black' : ''
                 }`}
               >
                 <h2 className='text-4xl'>{item.icon}</h2>
@@ -227,7 +218,7 @@ function CreateTrip() {
 
       <div className='my-10 justify-end flex'>
         <Button disabled={loading} onClick={OnGenerateTrip}>
-          {loading? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' />: 'Generate Trip'}
+          {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'}
         </Button>
       </div>
 
