@@ -7,15 +7,18 @@ function UserTripCardItem({ trip }) {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [placeInfo, setPlaceInfo] = useState(null);
 
-  const location = trip?.userSelection?.find(item => item.name === "location")?.value || "Unknown Location";
-  const noOfDays = trip?.userSelection?.find(item => item.name === "noOfDays")?.value || "Unknown Days";
-  const budget = trip?.userSelection?.find(item => item.name === "budget")?.value || "Unknown Budget";
+  // Ensure userSelection is an array before using find
+  const userSelection = Array.isArray(trip?.userSelection) ? trip.userSelection : [];
+
+  const location = userSelection.find(item => item.name === "location")?.value || "Unknown Location";
+  const noOfDays = userSelection.find(item => item.name === "noOfDays")?.value || "Unknown Days";
+  const budget = userSelection.find(item => item.name === "budget")?.value || "Unknown Budget";
 
   useEffect(() => {
     if (trip) {
       fetchPlaceDetails(location);
     }
-  }, [trip]);
+  }, [trip, location]);
 
   const fetchPlaceDetails = async (query) => {
     try {
@@ -42,7 +45,7 @@ function UserTripCardItem({ trip }) {
 
   return (
     <Link to={"/view-trip/" + trip?.id}>
-      <div className="snow-bg hover:scale-105 transition-all ">
+      <div className="snow-bg hover:scale-105 transition-all">
         <img
           src={photoUrl || ""}
           className="snow-bg object-cover rounded-xl h-[250px]"

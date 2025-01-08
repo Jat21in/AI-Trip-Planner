@@ -19,26 +19,16 @@ import { db } from '@/service/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 
 function CreateTrip() {
-  const [formData, setFormData] = useState({});
   const [place, setPlace] = useState();
+  const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [userAuthenticated, setUserAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateFields = () => {
-    const requiredFields = ['location', 'noOfDays', 'budget', 'traveler'];
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        toast.error(`Please fill the ${field} field!`);
-        return false;
-      }
-    }
-    return true;
+    const updatedFormData = [...formData.filter(item => item.name !== name), { name, value }];
+    setFormData(updatedFormData);
   };
 
   const login = useGoogleLogin({
@@ -48,7 +38,7 @@ function CreateTrip() {
     onError: (error) => {
       console.error("Login failed:", error);
       toast.error("Google Login failed. Please try again.");
-    },
+    }
   });
 
   const GetUserProfile = (tokenInfo) => {
@@ -59,6 +49,7 @@ function CreateTrip() {
       },
     })
       .then((resp) => {
+        console.log(resp.data);
         localStorage.setItem('user', JSON.stringify(resp.data));
         setUserAuthenticated(true);
         setOpenDialog(false);
@@ -71,28 +62,39 @@ function CreateTrip() {
   };
 
   const OnGenerateTrip = async () => {
-    if (!validateFields()) return;
+    const user = localStorage.getItem('user');
 
-    if (!userAuthenticated) {
+    if (!user || !userAuthenticated) {
       setOpenDialog(true);
       toast.warning("Please sign in with Google to proceed.");
       return;
     }
 
+    const noOfDays = formData?.find(item => item.name === 'noOfDays')?.value;
+    const location = formData?.find(item => item.name === 'location');
+    const budget = formData?.find(item => item.name === 'budget');
+    const traveler = formData?.find(item => item.name === 'traveler');
+
+    if (!noOfDays || !location || !budget || !traveler) {
+      toast.error("Please fill all details!");
+      return;
+    }
+
     setLoading(true);
     const FINAL_PROMPT = AI_PROMPT
-      .replace('{location}', formData.location)
-      .replace('{totalDays}', formData.noOfDays)
-      .replace('{traveler}', formData.traveler)
-      .replace('{budget}', formData.budget);
+      .replace('{location}', location?.value)
+      .replace('{totalDays}', noOfDays)
+      .replace('{traveler}', traveler?.value)
+      .replace('{budget}', budget?.value)
+      .replace('{totalDays}', noOfDays);
 
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
+      console.log("--", result?.response?.text());
       setLoading(false);
       SaveAiTrip(result?.response?.text());
       toast.success("Trip generated successfully!");
     } catch (error) {
-      setLoading(false);
       console.error("Failed to generate trip:", error);
       toast.error("Error generating trip. Please try again.");
     }
@@ -107,7 +109,7 @@ function CreateTrip() {
       userSelection: formData,
       tripData: JSON.parse(TripData),
       userEmail: user?.email,
-      id: docId,
+      id: docId
     });
     setLoading(false);
     navigate('/view-trip/' + docId);
@@ -126,7 +128,7 @@ function CreateTrip() {
       const input = document.getElementById('autocomplete');
       autocomplete = new window.google.maps.places.Autocomplete(input, {
         types: ['(cities)'],
-        fields: ['formatted_address'],
+        fields: ['name', 'formatted_address', 'place_id', 'geometry'],
       });
 
       autocomplete.addListener('place_changed', () => {
@@ -150,96 +152,115 @@ function CreateTrip() {
   }, []);
 
   return (
-    <div className='snow-bg sm:px-10 md:px-32 lg:px-56 xl:pd-10 px-5 mt-10'>
-      <h2 className='snow-bg font-bold text-3xl'>Tell us your travel preferences 🏕️🌴</h2>
-      <p className='snow-bg mt-3 text-gray-500 text-xl'>
-        Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.
-      </p>
-
-      <div className='snow-bg mt-20 flex flex-col gap-10'>
+    <div>
+      {/* Header Section */}
+      <header className="flex justify-between items-center py-4 px-6 bg-gray-100 shadow-md">
+        <h1 className="text-xl font-bold">Trip Planner</h1>
         <div>
-          <h2 className='snow-bg text-xl my-3 font-medium'>What is the destination of choice?</h2>
-          <input
-            id="autocomplete"
-            type="text"
-            placeholder="Search for a destination"
-            className="w-full p-2 text-lg border border-black rounded-md"
-            style={{ height: '40px' }}
-          />
+          <Button onClick={() => navigate('/')}>Home</Button>
+          <Button onClick={() => navigate('/trips')} className="ml-4">My Trips</Button>
         </div>
+      </header>
 
-        <div>
-          <h2 className='text-xl my-3 font-medium'>How many days are you planning your trip?</h2>
-          <Input
-            placeholder="Ex. 3"
-            type="number"
-            onChange={(e) => handleInputChange('noOfDays', e.target.value)}
-          />
-        </div>
+      {/* Main Content */}
+      <div className='sm:px-10 md:px-32 lg:px-56 xl:pd-10 px-5 mt-10'>
+        <h2 className='font-bold text-3xl'>Tell us your travel preferences 🏕️🌴</h2>
+        <p className='mt-3 text-gray-500 text-xl'>
+          Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.
+        </p>
 
-        <div>
-          <h2 className='text-xl my-3 font-medium'>What is Your Budget?</h2>
-          <div className='grid grid-cols-3 gap-5 mt-5'>
-            {SelectBudgetOptions.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => handleInputChange('budget', item.title)}
-                className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
-                  formData.budget === item.title ? 'shadow-lg border-black' : ''
-                }`}
-              >
-                <h2 className='text-4xl'>{item.icon}</h2>
-                <h2 className='font-bold text-lg'>{item.title}</h2>
-                <h2 className='text-sm text-gray-500'>{item.desc}</h2>
-              </div>
-            ))}
+        {/* Input and Selection Section */}
+        <div className='mt-20 flex flex-col gap-10'>
+          {/* Destination Input */}
+          <div>
+            <h2 className='text-xl my-3 font-medium'>What is the destination of choice?</h2>
+            <input
+              id="autocomplete"
+              type="text"
+              placeholder="Search for a destination"
+              className="w-full p-2 text-lg border border-black rounded-md"
+              style={{ height: '40px' }}
+            />
+          </div>
+
+          {/* Number of Days Input */}
+          <div>
+            <h2 className='text-xl my-3 font-medium'>How many days are you planning your trip?</h2>
+            <Input
+              placeholder="Ex. 3"
+              type="number"
+              onChange={(e) => handleInputChange('noOfDays', e.target.value)}
+            />
+          </div>
+
+          {/* Budget Selection */}
+          <div>
+            <h2 className='text-xl my-3 font-medium'>What is Your Budget?</h2>
+            <div className='grid grid-cols-3 gap-5 mt-5'>
+              {SelectBudgetOptions.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleInputChange('budget', item.title)}
+                  className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
+                    formData?.find(i => i.name === 'budget')?.value === item.title ? 'shadow-lg border-black' : ''
+                  }`}
+                >
+                  <h2 className='text-4xl'>{item.icon}</h2>
+                  <h2 className='font-bold text-lg'>{item.title}</h2>
+                  <h2 className='text-sm text-gray-500'>{item.desc}</h2>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Traveler Selection */}
+          <div>
+            <h2 className='text-xl my-3 font-medium'>Who do you plan on traveling with on your next adventure?</h2>
+            <div className='grid grid-cols-3 gap-5 mt-5'>
+              {SelectTravelsList.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleInputChange('traveler', item.people)}
+                  className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
+                    formData?.find(i => i.name === 'traveler')?.value === item.people ? 'shadow-lg border-black' : ''
+                  }`}
+                >
+                  <h2 className='text-4xl'>{item.icon}</h2>
+                  <h2 className='font-bold text-lg'>{item.title}</h2>
+                  <h2 className='text-sm text-gray-500'>{item.desc}</h2>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div>
-          <h2 className='text-xl my-3 font-medium'>Who do you plan on traveling with on your next adventure?</h2>
-          <div className='grid grid-cols-3 gap-5 mt-5'>
-            {SelectTravelsList.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => handleInputChange('traveler', item.people)}
-                className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg ${
-                  formData.traveler === item.people ? 'shadow-lg border-black' : ''
-                }`}
-              >
-                <h2 className='text-4xl'>{item.icon}</h2>
-                <h2 className='font-bold text-lg'>{item.title}</h2>
-                <h2 className='text-sm text-gray-500'>{item.desc}</h2>
-              </div>
-            ))}
-          </div>
+        {/* Generate Button */}
+        <div className='my-10 justify-end flex'>
+          <Button disabled={loading} onClick={OnGenerateTrip}>
+            {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'}
+          </Button>
         </div>
-      </div>
 
-      <div className='my-10 justify-end flex'>
-        <Button disabled={loading} onClick={OnGenerateTrip}>
-          {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : 'Generate Trip'}
-        </Button>
+        {/* Dialog */}
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogDescription>
+                <img src="/logo.svg" alt="Logo" />
+                <h2 className='font-bold text-lg mt-7'>Sign In With Google</h2>
+                <p>Sign in to the App with Google authentication securely</p>
+                <Button
+                  onClick={login}
+                  className="w-full mt-5 flex gap-4 items-center"
+                >
+                  <FcGoogle className='h-7 w-7' />
+                  Sign In With Google
+                </Button>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogDescription>
-              <img src="/logo.svg" alt="Logo" />
-              <h2 className='snow-bg font-bold text-lg mt-7'>Sign In With Google</h2>
-              <p>Sign in to the App with Google authentication securely</p>
-              <Button
-                onClick={login}
-                className="snow-bg w-full mt-5 flex gap-4 items-center"
-              >
-                <FcGoogle className='snow-bg h-7 w-7' />
-                Sign In With Google
-              </Button>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
