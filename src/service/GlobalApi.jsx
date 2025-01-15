@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = 'https://maps.gomaps.pro/maps/api/place/textsearch/json';
 
-const API_KEY = 'AlzaSyaDR0THIsyDP9-wr8cY_Leb3fRRQWxYiFe';
+const API_KEY = 'AlzaSyeMDhtFN4PG-Muy9BeXQfbpXzht82vxamp';
 
 const config = {
     headers: {
@@ -20,4 +20,4 @@ export const GetPlaceDetails = async (query) => {
     }
 };
 
-export const PHOTO_REF_URL = 'https://maps.gomaps.pro/maps/api/place/photo?photo_reference={{placeId}}&maxwidth=800&maxheight=800&key=AlzaSyaDR0THIsyDP9-wr8cY_Leb3fRRQWxYiFe'; // Increased resolution
+export const PHOTO_REF_URL = 'https://maps.gomaps.pro/maps/api/place/photo?photo_reference={{placeId}}&maxwidth=800&maxheight=800&key=AlzaSyeMDhtFN4PG-Muy9BeXQfbpXzht82vxamp'; // Increased resolution

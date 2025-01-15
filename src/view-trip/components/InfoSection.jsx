@@ -7,26 +7,30 @@ function InfoSection({ trip }) {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
-  const location = trip?.userSelection?.[0]?.value || 'Unknown Location';
+  // Access location correctly from userSelection
+  const location = trip?.userSelection?.location || 'Unknown Location';
 
   useEffect(() => {
-    if (trip) {
+    if (trip && location !== 'Unknown Location') {
+      console.log("Fetching details for location:", location);
       fetchPlaceDetails(location);
     }
-  }, [trip]);
+  }, [trip, location]);
 
   const fetchPlaceDetails = async (query) => {
     try {
       const data = await GetPlaceDetails(query);
       console.log("Place Details:", data); // Log place details to the console
 
-      const result = data.results[0]; // Assuming the first result is the most relevant
+      const result = data.results?.[0]; // Assuming the first result is the most relevant
       if (result?.photos?.length > 0) {
         const photoRef = result.photos[0].photo_reference;
 
         // Generate the photo URL using the updated parameters
         const generatedPhotoUrl = PHOTO_REF_URL.replace('{{placeId}}', photoRef);
         setPhotoUrl(generatedPhotoUrl);
+
+        console.log("Generated Photo URL:", generatedPhotoUrl); // Log the generated photo URL
       } else {
         console.warn("No photos available for this place.");
       }

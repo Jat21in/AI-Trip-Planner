@@ -15,10 +15,13 @@ function UserTripCardItem({ trip }) {
   const budget = userSelection.find(item => item.name === "budget")?.value || "Unknown Budget";
 
   useEffect(() => {
-    if (trip) {
+    if (location !== "Unknown Location") {
+      console.log("Fetching place details for location:", location);
       fetchPlaceDetails(location);
+    } else {
+      console.warn("Location is unknown, skipping API call.");
     }
-  }, [trip, location]);
+  }, [location]);
 
   const fetchPlaceDetails = async (query) => {
     try {
@@ -26,7 +29,7 @@ function UserTripCardItem({ trip }) {
       setPlaceInfo(data);
       console.log("Place Details:", data);
 
-      const result = data.results[0];
+      const result = data?.results?.[0];
       if (result?.photos?.length > 0) {
         const photoRef = result.photos[0].photo_reference;
         setPhotoReference(photoRef);
@@ -46,10 +49,17 @@ function UserTripCardItem({ trip }) {
   return (
     <Link to={"/view-trip/" + trip?.id}>
       <div className="snow-bg hover:scale-105 transition-all">
-        <img
-          src={photoUrl || ""}
-          className="snow-bg object-cover rounded-xl h-[250px]"
-        />
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt={`Preview of ${location}`}
+            className="snow-bg object-cover rounded-xl h-[250px]"
+          />
+        ) : (
+          <div className="snow-bg bg-gray-200 rounded-xl h-[250px] flex items-center justify-center text-gray-500">
+            Loading Image...
+          </div>
+        )}
         <div>
           <h2 className="snow-bg font-bold text-lg">{location}</h2>
           <h2 className="snow-bg text-sm text-gray-500">

@@ -55,19 +55,19 @@ function Header() {
   }, []);
 
   return (
-    <div className="p-3 shadow-sm flex justify-between items-center px-5">
-      <img src="/logo.svg" alt="Logo" />
+    <div className="snow-bg p-3 shadow-sm flex justify-between items-center px-5">
+      <img src="/Logo.PNG" alt="Logo" className="snow-bg max-w-[200px] max-h-[50px] w-auto h-auto object-contain" />
       <div>
-        <div className="flex items-center gap-5">
+        <div className="snow-bg flex items-center gap-5">
           {user ? (
-            <div className="flex items-center gap-3"> {/* Adjusted gap here */}
+            <div className="snow-bg flex items-center gap-3"> {/* Adjusted gap here */}
               <a href='/create-trip'>
-                <Button variant="outline" className="rounded-full">
+                <Button variant="outline" className="snow-bg rounded-full">
                   + Create Trip
                 </Button>
               </a>
               <a href='/my-trips'>
-                <Button variant="outline" className="rounded-full">
+                <Button variant="outline" className="snow-bg rounded-full">
                   My Trips
                 </Button>
               </a>
@@ -76,7 +76,7 @@ function Header() {
                 <PopoverTrigger>
                   <img
                     src={user?.picture || "/placeholder.jpg"} // Fallback image
-                    className="h-[35px] w-[35px] rounded-full border-0 p-0 object-cover" // Removed padding, border, and ensured object-fit cover
+                    className="snow-bg h-[35px] w-[35px] rounded-full border-0 p-0 object-cover" // Removed padding, border, and ensured object-fit cover
                     alt="User Profile"
                   />
                 </PopoverTrigger>
@@ -86,7 +86,7 @@ function Header() {
                     onClick={() => {
                       googleLogout();
                       localStorage.clear();
-                      window.location.reload();
+                      window.location.href = "/";
                     }}
                   >
                     Logout
@@ -95,7 +95,7 @@ function Header() {
               </Popover>
             </div>
           ) : (
-            <Button onClick={() => setOpenDialog(true)} className="bg-white border-transparent w-6 h-6 p-0 rounded-full">Sign In</Button>
+            <Button onClick={() => setOpenDialog(true)}>Sign In</Button>
           )}
         </div>
 
@@ -103,11 +103,11 @@ function Header() {
           <DialogContent>
             <DialogHeader>
               <DialogDescription>
-                <img src="/logo.svg" alt="Logo" />
-                <h2 className="font-bold text-lg mt-7">Sign In With Google</h2>
+                <img src="/logo.svg" alt="Logo" className="snow-bg max-w-[200px] max-h-[50px] w-auto h-auto object-contain" />
+                <h2 className="snow-bg font-bold text-lg mt-7">Sign In With Google</h2>
                 <p>Sign in to the App with Google authentication securely</p>
-                <Button onClick={login} className="w-full mt-5 flex gap-4 items-center">
-                  <FcGoogle className="h-7 w-7" />
+                <Button onClick={login} className="snow-bg w-full mt-5 flex gap-4 items-center">
+                  <FcGoogle className="snow-bg h-7 w-7" />
                   Sign In With Google
                 </Button>
               </DialogDescription>

@@ -14,7 +14,7 @@ function MyTrips() {
 
     const GetUserTrips = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
-        
+        console.log("jatin", user);
         if (!user) {
             navigation('/');
             return;
@@ -26,7 +26,7 @@ function MyTrips() {
 
         querySnapshot.forEach((doc) => {
             console.log(doc.id, " => ", doc.data());
-            trips.push(doc.data()); // Collecting data into the trips array
+            trips.push(prevVal=>[...prevVal,doc.data()]); // Collecting data into the trips array
         });
 
         setUserTrips(trips); // Set the retrieved trips
